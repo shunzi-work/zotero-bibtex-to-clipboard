@@ -47,8 +47,6 @@ firstauthor_secondauthor_year
 | Müller, García | 2019 | `muller_garcia_2019` |
 | Smith, Jones, Brown | 2020 | `smith_jones_2020` |
 
-Rules: max two authors · all lowercase · diacritics stripped · non-alphanumeric removed · missing year → `xxxx`
-
 ## How BibTeX fields are generated
 
 BibClip uses the bundled `bibtex.csl` file (a [custom CSL style](https://github.com/shunzi-work/styles)) to render BibTeX fields via Zotero's CSL engine. This is the same engine Zotero uses for all citation formatting, so field content is accurate and consistent. The CSL is automatically installed into Zotero's style manager on first use — you don't need to install it manually.
@@ -57,8 +55,6 @@ If the CSL engine is unavailable for any reason, BibClip falls back to reading f
 
 ## Text Processing
 ### Accent to LaTeX Conversion (in field values)
-
-All text fields (e.g., title, author, journal) are processed character-by-character using the following conversion table:
 
 | Unicode | LaTeX     |
 | :------ | :-------- |
@@ -75,8 +71,6 @@ All text fields (e.g., title, author, journal) are processed character-by-charac
 
 ### Special Character Escaping
 
-The following special characters are automatically escaped for LaTeX compatibility:
-
 | Input | Output |
 | :---- | :----- |
 | `&`   | `\&`  |
@@ -87,17 +81,7 @@ The following special characters are automatically escaped for LaTeX compatibili
 
 Unicode characters U+202F (narrow no-break space) and U+00A0 (non-breaking space) are automatically removed if they appear before punctuation characters (i.e., `?`, `!`, `;`, `:`). These are often automatically inserted by Zotero's CSL engine when using certain locale settings, such as French.
 
-### Special character escaping
-
-| Input | Output |
-|---|---|
-| `&` | `\&` |
-| `#` | `\#` |
-| `%` | `\%` |
-
-### Rogue whitespace
-
-U+202F (narrow no-break space) and U+00A0 (non-breaking space) that appear before punctuation characters (`?`, `!`, `;`, `:`) are removed. These are inserted automatically by Zotero's CSL engine under French locale settings.
+## File structure
 
 ```
 bibclip/
