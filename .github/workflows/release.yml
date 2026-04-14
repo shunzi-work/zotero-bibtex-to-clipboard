@@ -1,0 +1,49 @@
+name: Build and Release XPI
+
+# Triggers when you push a version tag, e.g. v1.0.0
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read version from manifest.json
+        id: version
+        run: |
+          VERSION=$(python3 -c "import json; print(json.load(open('manifest.json'))['version'])")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Building BibClip v$VERSION"
+
+      - name: Build XPI
+        run: |
+          zip -r bibclip-${{ steps.version.outputs.version }}.xpi \
+            manifest.json \
+            bootstrap.js \
+            prefs.js \
+            chrome/content/scripts/bibclip.js \
+            chrome/content/bibtex.csl \
+            chrome/locale/en-US/bibclip.ftl
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "BibClip v${{ steps.version.outputs.version }}"
+          body: |
+            ## BibClip v${{ steps.version.outputs.version }}
+
+            ### Install
+            1. Download `bibclip-${{ steps.version.outputs.version }}.xpi` below
+            2. In Zotero: **Tools → Plugins → ⚙️ → Install Plugin from File...**
+
+            ### Changes
+            <!-- describe what changed -->
+          files: bibclip-${{ steps.version.outputs.version }}.xpi
+          draft: false
+          prerelease: false
