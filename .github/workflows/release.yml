@@ -1,10 +1,12 @@
 name: Build and Release XPI
 
-# Triggers when you push a version tag, e.g. v1.0.0
 on:
   push:
     tags:
       - "v*"
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build:
@@ -30,7 +32,8 @@ jobs:
             bootstrap.js \
             prefs.js \
             chrome/content/scripts/bibclip.js \
-            chrome/content/bibtex.csl \
+            chrome/content/icon.svg \
+            chrome/content/preferences.xhtml \
             chrome/locale/en-US/bibclip.ftl
 
       - name: Create GitHub Release

@@ -6,7 +6,7 @@ A [Zotero](https://www.zotero.org/) plugin for one-click BibTeX copying with LaT
 
 ## Features
 
-Select one or more items in Zotero, right-click, and choose **Copy as BibTeX**. The entry is copied to the clipboard, ready to paste into any `.bib` file. BibClip handles the following LaTeX formatting:
+Click the clipboard icon in the Zotero toolbar to copy selected item(s) as BibTeX, ready to paste into any `.bib` file. BibClip handles all the LaTeX formatting automatically:
 
 - Accented characters are converted to LaTeX commands (`ü` → `{\"u}`, `é` → `{\'e}`, etc.)
 - Special characters are escaped (`&` → `\&`, `#` → `\#`, `%` → `\%`)
@@ -24,7 +24,7 @@ Select one or more items in Zotero, right-click, and choose **Copy as BibTeX**. 
 ## Usage
 
 1. Select one or more items in your Zotero library
-2. Right-click → **Copy as BibTeX**
+2. Click the **clipboard icon** in the toolbar above the item list
 3. Paste into your `.bib` file
 
 ### Citation key behaviour
@@ -47,11 +47,17 @@ firstauthor_secondauthor_year
 | Müller, García | 2019 | `muller_garcia_2019` |
 | Smith, Jones, Brown | 2020 | `smith_jones_2020` |
 
-## How BibTeX fields are generated
+Rules: max two authors · all lowercase · diacritics stripped · non-alphanumeric removed · missing year → `xxxx`
 
-BibClip uses the bundled `bibtex.csl` file (a [custom CSL style](https://github.com/shunzi-work/styles)) to render BibTeX fields via Zotero's CSL engine. This is the same engine Zotero uses for all citation formatting, so field content is accurate and consistent. The CSL is automatically installed into Zotero's style manager on first use — you don't need to install it manually.
+## Journal names
 
-If the CSL engine is unavailable for any reason, BibClip falls back to reading fields directly from Zotero's item data using the same field mapping.
+For journal articles, BibClip checks the item's **Journal Abbr** field first. If that field is populated, the abbreviation is used as the `journal` value. If not, the full journal name is used as a fallback.
+
+
+## Settings
+
+Open **Edit → Preferences → BibClip** (or **Zotero → Settings → BibClip** on macOS) to choose which fields to include in the BibTeX output.
+
 
 ## Text Processing
 ### Accent to LaTeX Conversion (in field values)
@@ -80,28 +86,6 @@ If the CSL engine is unavailable for any reason, BibClip falls back to reading f
 ### Rogue Whitespace Removal
 
 Unicode characters U+202F (narrow no-break space) and U+00A0 (non-breaking space) are automatically removed if they appear before punctuation characters (i.e., `?`, `!`, `;`, `:`). These are often automatically inserted by Zotero's CSL engine when using certain locale settings, such as French.
-
-## File structure
-
-```
-bibclip/
-├── .github/
-│   └── workflows/
-│       └── release.yml                   — Auto-build XPI on git tag
-├── .gitignore
-├── manifest.json                         — Plugin identity and Zotero version range
-├── bootstrap.js                          — Plugin lifecycle (startup/shutdown/window hooks)
-├── prefs.js                              — Default preferences
-├── README.md
-└── chrome/
-    ├── content/
-    │   ├── bibtex.csl                    — Bundled CSL style
-    │   └── scripts/
-    │       └── bibclip.js                — All plugin logic
-    └── locale/
-        └── en-US/
-            └── bibclip.ftl               — Menu label strings
-```
 
 ## License
 
