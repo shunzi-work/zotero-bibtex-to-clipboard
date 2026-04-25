@@ -33,8 +33,7 @@ jobs:
             prefs.js \
             chrome/content/scripts/bibclip.js \
             chrome/content/icon.svg \
-            chrome/content/preferences.xhtml \
-            chrome/locale/en-US/bibclip.ftl
+            chrome/content/preferences.xhtml
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
