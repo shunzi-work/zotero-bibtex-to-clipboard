@@ -1,4 +1,4 @@
-// BibClip v2.1.0 — default preferences
+// BibClip v2.1.1 — default preferences
 // All field prefs default to true except those typically unwanted in BibTeX
 
 pref("extensions.bibclip.field.title",     true);
