@@ -21,6 +21,26 @@ Click the clipboard icon in the Zotero toolbar to copy selected item(s) as BibTe
 2. In Zotero: **Tools → Plugins → ⚙️ → Install Plugin from File...**
 3. Select the `.xpi` file
 
+## Version bump workflow
+
+When releasing a new version, use the helper script:
+
+```bash
+./bump-version.sh 2.2.0
+```
+
+To update version references without creating a git tag:
+
+```bash
+./bump-version.sh 2.2.0 --no-tag
+```
+
+This updates:
+- `manifest.json` version
+- the banner comment in `prefs.js`
+- commits both files
+- optionally creates `v2.2.0` git tag
+
 ## Usage
 
 1. Select one or more items in your Zotero library
