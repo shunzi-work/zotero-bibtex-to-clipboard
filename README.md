@@ -15,7 +15,7 @@ Click the clipboard icon in the Zotero toolbar to copy selected item(s) as BibTe
 
 ## Installation
 
-**Requirements:** Zotero 8.0 or later
+**Requirements:** Zotero 7.0 or later
 
 1. Download the latest `bibclip-x.x.x.xpi` from the [Releases](https://github.com/shunzi-work/zotero-bibtex-to-clipboard/releases) page
 2. In Zotero: **Tools → Plugins → ⚙️ → Install Plugin from File...**
@@ -49,14 +49,18 @@ firstauthor_secondauthor_year
 
 Rules: max two authors · all lowercase · diacritics stripped · non-alphanumeric removed · missing year → `xxxx`
 
-## Journal names
-
-For journal articles, BibClip checks the item's **Journal Abbr** field first. If that field is populated, the abbreviation is used as the `journal` value. If not, the full journal name is used as a fallback.
-
-
 ## Settings
 
-Open **Edit → Preferences → BibClip** (or **Zotero → Settings → BibClip** on macOS) to choose which fields to include in the BibTeX output.
+Open **Edit → Preferences → BibClip** (or **Zotero → Settings → BibClip** on macOS) to customize:
+
+- **Fields to export** — Choose which fields to include in the BibTeX output
+- **Journal names** — Select whether to use abbreviated journal names (if available) or always use full names
+
+### Journal Names Preference
+
+For journal articles, BibClip can use either:
+- **Use abbreviated name (if available)** (default): Uses the item's **Journal Abbr** field if available; falls back to full name
+- **Always use full name**: Always uses the full journal name from the **Publication Title** field
 
 
 ## Text Processing

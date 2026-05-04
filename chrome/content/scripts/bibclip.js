@@ -86,10 +86,6 @@ BibClip = {
             var toolbar = doc.getElementById("zotero-items-toolbar");
             if (!toolbar) { Zotero.log("[BibClip] toolbar not found"); return; }
 
-            var sep = doc.createXULElement("toolbarseparator");
-            sep.id = this.TOOLBAR_SEP_ID;
-            toolbar.appendChild(sep);
-
             var btn = doc.createXULElement("toolbarbutton");
             btn.id = this.TOOLBAR_BTN_ID;
             btn.setAttribute("label", "Copy as BibTeX");
@@ -97,6 +93,16 @@ BibClip = {
             btn.setAttribute("class", "zotero-tb-button");
             btn.setAttribute("image", this.rootURI + "chrome/content/icon.svg");
             btn.setAttribute("disabled", "true");
+
+            var newNoteButton = doc.getElementById("zotero-tb-note-add");
+
+            if (newNoteButton) {
+                // Insert the new button directly after the "New Note" button.
+                newNoteButton.parentNode.insertBefore(btn, newNoteButton.nextSibling);
+            } else {
+                // Fallback: if "New Item" button isn't found, append to the toolbar.
+                toolbar.appendChild(btn);
+            }
 
             var pane = window.ZoteroPane;
             if (pane && pane.itemsView) {
@@ -119,7 +125,6 @@ BibClip = {
                 } catch(e) { Zotero.logError(e); }
             });
 
-            toolbar.appendChild(btn);
             Zotero.log("[BibClip] Toolbar button injected");
         } catch(e) {
             Components.utils.reportError("[BibClip] addToWindow() failed: " + e);
@@ -148,6 +153,7 @@ BibClip = {
 
     _pref(key) { return Zotero.Prefs.get("extensions.bibclip." + key, true); },
     _fieldEnabled(name) { return this._pref("field." + name) !== false; },
+    _journalNameMode() { return this._pref("journal_name_mode") || "abbreviated"; },
 
     _handleCommand(items) {
         var self = this;
@@ -269,7 +275,12 @@ BibClip = {
                 var bookTitle = item.getField("bookTitle") || item.getField("proceedingsTitle");
                 if (bookTitle) fields.booktitle = this.latexEscape(bookTitle);
             } else {
-                var journalName = item.getField("journalAbbreviation") || item.getField("publicationTitle") || "";
+                var journalName;
+                if (this._journalNameMode() === "full") {
+                    journalName = item.getField("publicationTitle") || item.getField("journalAbbreviation") || "";
+                } else {
+                    journalName = item.getField("journalAbbreviation") || item.getField("publicationTitle") || "";
+                }
                 if (journalName) fields.journal = this.latexEscape(journalName);
             }
         }

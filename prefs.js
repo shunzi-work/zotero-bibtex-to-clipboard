@@ -1,4 +1,4 @@
-// BibClip v2.0.0 — default preferences
+// BibClip v2.1.0 — default preferences
 // All field prefs default to true except those typically unwanted in BibTeX
 
 pref("extensions.bibclip.field.title",     true);
@@ -19,3 +19,6 @@ pref("extensions.bibclip.field.language",  false);
 pref("extensions.bibclip.field.abstract",  false);
 pref("extensions.bibclip.field.keywords",  false);
 pref("extensions.bibclip.field.note",      false);
+
+// Journal name display preference
+pref("extensions.bibclip.journal_name_mode", "abbreviated");
