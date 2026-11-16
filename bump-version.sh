@@ -30,7 +30,13 @@ manifest['version'] = version
 manifest_path.write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
 
 prefs_text = prefs_path.read_text(encoding='utf-8')
-new_prefs_text, count = re.subn(r'^(// BibClip v)([0-9]+\.[0-9]+\.[0-9]+)', r'\\1' + version, prefs_text, count=1, flags=re.MULTILINE)
+new_prefs_text, count = re.subn(
+    r'^(// BibClip v)([0-9]+\.[0-9]+\.[0-9]+)',
+    lambda match: match.group(1) + version,
+    prefs_text,
+    count=1,
+    flags=re.MULTILINE,
+)
 if count != 1:
     raise SystemExit('Failed to update version banner in prefs.js')
 prefs_path.write_text(new_prefs_text, encoding='utf-8')

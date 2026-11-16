@@ -2,7 +2,7 @@
 
 A [Zotero](https://www.zotero.org/) plugin for one-click BibTeX copying with LaTeX-safe encoding.
 
-> **Written by [Claude](https://claude.ai) (Anthropic), with iterative refinement through conversation.**
+> **Written by AI ([Claude](https://claude.ai)/GPT), with iterative refinement through conversation.**
 
 ## Features
 
@@ -17,29 +17,33 @@ Click the clipboard icon in the Zotero toolbar to copy selected item(s) as BibTe
 
 **Requirements:** Zotero 7.0 or later
 
-1. Download the latest `bibclip-x.x.x.xpi` from the [Releases](https://github.com/shunzi-work/zotero-bibtex-to-clipboard/releases) page
+1. Download the latest XPI from the [Releases](https://github.com/shunzi-work/zotero-bibtex-to-clipboard/releases) page
 2. In Zotero: **Tools → Plugins → ⚙️ → Install Plugin from File...**
 3. Select the `.xpi` file
 
 ## Version bump workflow
 
-When releasing a new version, use the helper script:
+When releasing a new version, use the helper script with the next version number:
 
 ```bash
-./bump-version.sh 2.2.0
+./bump-version.sh NEW_VERSION
 ```
 
 To update version references without creating a git tag:
 
 ```bash
-./bump-version.sh 2.2.0 --no-tag
+./bump-version.sh NEW_VERSION --no-tag
 ```
+
+Replace `NEW_VERSION` with the release version (for example, `2.1.3` after `2.1.2`).
 
 This updates:
 - `manifest.json` version
 - the banner comment in `prefs.js`
 - commits both files
-- optionally creates `v2.2.0` git tag
+- optionally creates a Git tag named `v<version>`
+
+See [CHANGELOG.md](./CHANGELOG.md) for release notes.
 
 ## Usage
 

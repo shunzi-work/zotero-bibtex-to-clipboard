@@ -81,49 +81,55 @@ BibClip = {
     addToWindow(window) {
         try {
             var doc = window.document;
-            if (!doc || doc.getElementById(this.TOOLBAR_BTN_ID)) return;
+            if (!doc) return;
 
-            var toolbar = doc.getElementById("zotero-items-toolbar");
-            if (!toolbar) { Zotero.log("[BibClip] toolbar not found"); return; }
+            var btn = doc.getElementById(this.TOOLBAR_BTN_ID);
+            if (!btn) {
+                var toolbar = doc.getElementById("zotero-items-toolbar");
+                if (!toolbar) { Zotero.log("[BibClip] toolbar not found"); return; }
 
-            var btn = doc.createXULElement("toolbarbutton");
-            btn.id = this.TOOLBAR_BTN_ID;
-            btn.setAttribute("label", "Copy as BibTeX");
-            btn.setAttribute("tooltiptext", "Copy selected item(s) as LaTeX-safe BibTeX");
-            btn.setAttribute("class", "zotero-tb-button");
-            btn.setAttribute("image", this.rootURI + "chrome/content/icon.svg");
-            btn.setAttribute("disabled", "true");
+                btn = doc.createXULElement("toolbarbutton");
+                btn.id = this.TOOLBAR_BTN_ID;
+                btn.setAttribute("label", "Copy as BibTeX");
+                btn.setAttribute("tooltiptext", "Copy selected item(s) as LaTeX-safe BibTeX");
+                btn.setAttribute("class", "zotero-tb-button");
+                btn.setAttribute("image", this.rootURI + "chrome/content/icon.svg");
+                btn.disabled = true;
 
-            var newNoteButton = doc.getElementById("zotero-tb-note-add");
+                var newNoteButton = doc.getElementById("zotero-tb-note-add");
 
-            if (newNoteButton) {
-                // Insert the new button directly after the "New Note" button.
-                newNoteButton.parentNode.insertBefore(btn, newNoteButton.nextSibling);
-            } else {
-                // Fallback: if "New Item" button isn't found, append to the toolbar.
-                toolbar.appendChild(btn);
+                if (newNoteButton) {
+                    // Insert the new button directly after the "New Note" button.
+                    newNoteButton.parentNode.insertBefore(btn, newNoteButton.nextSibling);
+                } else {
+                    // Fallback: if "New Item" button isn't found, append to the toolbar.
+                    toolbar.appendChild(btn);
+                }
+
+                var self = this;
+                btn.addEventListener("command", function() {
+                    try {
+                        var items = Zotero.getActiveZoteroPane().getSelectedItems();
+                        self._handleCommand(items || []);
+                    } catch(e) { Zotero.logError(e); }
+                });
             }
 
             var pane = window.ZoteroPane;
-            if (pane && pane.itemsView) {
+            if (pane && pane.itemsView && btn._bibclipItemsView !== pane.itemsView) {
+                var itemsView = pane.itemsView;
                 var updateState = function() {
                     try {
                         var hasItems = pane.getSelectedItems().some(function(i) {
                             return !i.isNote() && !i.isAttachment();
                         });
-                        btn.setAttribute("disabled", hasItems ? "false" : "true");
+                        btn.disabled = !hasItems;
                     } catch(e) {}
                 };
-                pane.itemsView.onSelect.addListener(updateState);
+                itemsView.onSelect.addListener(updateState);
+                btn._bibclipItemsView = itemsView;
+                updateState();
             }
-
-            var self = this;
-            btn.addEventListener("command", function() {
-                try {
-                    var items = Zotero.getActiveZoteroPane().getSelectedItems();
-                    self._handleCommand(items || []);
-                } catch(e) { Zotero.logError(e); }
-            });
 
             Zotero.log("[BibClip] Toolbar button injected");
         } catch(e) {
