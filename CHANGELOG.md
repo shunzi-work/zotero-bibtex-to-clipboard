@@ -2,9 +2,6 @@
 
 ## Unreleased
 
-
-## 2.1.3 - 2026-11-18
-
 ### Added
 
 - Added export preferences for publisher, edition, address, keywords, and Extra note fields.
@@ -13,7 +10,7 @@
 
 - Apply LaTeX escaping consistently to exported metadata fields and tags.
 - Generate citation keys and check for duplicates across each item's entire library, regardless of collection; generated fallback keys use an available numeric suffix.
-- Replaced the local version-bump script with a pull-request-based release preparation workflow and documented the release steps.
+- Replaced the local version-bump script and multi-step release process with a single workflow that updates the version, creates a matching tag, builds the XPI, and publishes the release.
 
 ## 2.1.2 - 2026-11-16
 
