@@ -22,6 +22,11 @@ jobs:
         id: version
         run: |
           VERSION=$(python3 -c "import json; print(json.load(open('manifest.json'))['version'])")
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          if [ "$TAG_VERSION" != "$VERSION" ]; then
+            echo "Tag version $TAG_VERSION does not match manifest version $VERSION" >&2
+            exit 1
+          fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Building BibClip v$VERSION"
 

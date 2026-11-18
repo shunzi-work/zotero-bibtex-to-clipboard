@@ -185,18 +185,31 @@ BibClip = {
     },
 
     _ensureCiteKey(item) {
-        if (item.getField("citationKey")) return Promise.resolve();
+        var existingKey = item.getField("citationKey");
+        if (existingKey) return this._checkCiteKeyUnique(item, existingKey);
         return this._buildUniqueKey(item).then(function(key) {
             item.setField("citationKey", key);
             return item.saveTx().then(function() { Zotero.log("[BibClip] Assigned key: " + key); });
         });
     },
 
+    _checkCiteKeyUnique(item, citeKey) {
+        return Zotero.Items.getAll(item.libraryID).then(function(allItems) {
+            for (var i = 0; i < allItems.length; i++) {
+                var other = allItems[i];
+                if (!other.isRegularItem() || other.id === item.id) continue;
+                if (other.getField("citationKey") === citeKey) {
+                    throw new Error("Citation key '" + citeKey + "' is already used by another item in this library.");
+                }
+            }
+        });
+    },
+
     _buildUniqueKey(item) {
         var baseKey = this._buildBaseKey(item);
-        return Zotero.Items.getAll(Zotero.Libraries.userLibraryID)
+        return Zotero.Items.getAll(item.libraryID)
             .then(function(allItems) {
-                var usedKeys = {};
+                var usedKeys = Object.create(null);
                 for (var i = 0; i < allItems.length; i++) {
                     var other = allItems[i];
                     if (!other.isRegularItem() || other.id === item.id) continue;
@@ -208,7 +221,10 @@ BibClip = {
                     var candidate = baseKey + BIBCLIP_SUFFIXES[j];
                     if (!usedKeys[candidate]) return candidate;
                 }
-                return baseKey + "_" + Date.now();
+                for (var suffix = 1; ; suffix++) {
+                    var fallback = baseKey + "_" + suffix;
+                    if (!usedKeys[fallback]) return fallback;
+                }
             });
     },
 
@@ -302,38 +318,38 @@ BibClip = {
             var place = item.getField("place"); if (place) fields.address = this.latexEscape(place);
         }
         if (this._fieldEnabled("volume")) {
-            var volume = item.getField("volume"); if (volume) fields.volume = volume;
+            var volume = item.getField("volume"); if (volume) fields.volume = this.latexEscape(volume);
         }
         if (this._fieldEnabled("number")) {
-            var number = item.getField("issue") || item.getField("number"); if (number) fields.number = number;
+            var number = item.getField("issue") || item.getField("number"); if (number) fields.number = this.latexEscape(number);
         }
         if (this._fieldEnabled("pages")) {
-            var pages = item.getField("pages"); if (pages) fields.pages = pages.replace(/[–—]/g, "--");
+            var pages = item.getField("pages"); if (pages) fields.pages = this.latexEscape(pages.replace(/[–—]/g, "--"));
         }
         if (this._fieldEnabled("edition")) {
-            var edition = item.getField("edition"); if (edition) fields.edition = edition;
+            var edition = item.getField("edition"); if (edition) fields.edition = this.latexEscape(edition);
         }
         if (this._fieldEnabled("doi")) {
-            var doi = item.getField("DOI"); if (doi) fields.doi = doi;
+            var doi = item.getField("DOI"); if (doi) fields.doi = this.latexEscape(doi);
         }
         if (this._fieldEnabled("url")) {
-            var url = item.getField("url"); if (url) fields.url = url;
+            var url = item.getField("url"); if (url) fields.url = this.latexEscape(url);
         }
         if (this._fieldEnabled("isbn")) {
-            var isbn = item.getField("ISBN"); if (isbn) fields.isbn = isbn;
+            var isbn = item.getField("ISBN"); if (isbn) fields.isbn = this.latexEscape(isbn);
         }
         if (this._fieldEnabled("issn")) {
-            var issn = item.getField("ISSN"); if (issn) fields.issn = issn;
+            var issn = item.getField("ISSN"); if (issn) fields.issn = this.latexEscape(issn);
         }
         if (this._fieldEnabled("language")) {
-            var lang = item.getField("language"); if (lang) fields.language = lang;
+            var lang = item.getField("language"); if (lang) fields.language = this.latexEscape(lang);
         }
         if (this._fieldEnabled("abstract")) {
             var abstr = item.getField("abstractNote"); if (abstr) fields.abstract = this.latexEscape(abstr);
         }
         if (this._fieldEnabled("keywords")) {
             var tags = item.getTags();
-            if (tags && tags.length) fields.keywords = tags.map(function(t) { return t.tag; }).join(", ");
+            if (tags && tags.length) fields.keywords = this.latexEscape(tags.map(function(t) { return t.tag; }).join(", "));
         }
         if (this._fieldEnabled("note")) {
             var extra = item.getField("extra"); if (extra) fields.note = this.latexEscape(extra);
@@ -387,17 +403,33 @@ BibClip = {
      * Convert a string to LaTeX-safe output:
      *  1. Strip HTML tags and rogue whitespace (_cleanText)
      *  2. Replace accented/special characters with LaTeX commands
-     *  3. Escape & # %
+     *  3. Escape LaTeX special characters in plain text
      */
     latexEscape(str) {
         if (!str) return str;
         str = this._cleanText(str);
         var out = "";
+        var latexSpecialChars = {
+            "\\": "\\textbackslash{}",
+            "{": "\\{",
+            "}": "\\}",
+            "$": "\\$",
+            "&": "\\&",
+            "#": "\\#",
+            "%": "\\%",
+            "_": "\\_",
+            "^": "\\textasciicircum{}",
+            "~": "\\textasciitilde{}"
+        };
         for (var i = 0; i < str.length; i++) {
             var ch = str[i];
-            out += (BIBCLIP_ACCENT_MAP[ch] !== undefined) ? BIBCLIP_ACCENT_MAP[ch] : ch;
+            if (BIBCLIP_ACCENT_MAP[ch] !== undefined) {
+                out += BIBCLIP_ACCENT_MAP[ch];
+            } else {
+                out += latexSpecialChars[ch] || ch;
+            }
         }
-        return out.replace(/&/g, "\\&").replace(/#/g, "\\#").replace(/%/g, "\\%");
+        return out;
     },
 
     _copyToClipboard(text) {

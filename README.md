@@ -9,9 +9,9 @@ A [Zotero](https://www.zotero.org/) plugin for one-click BibTeX copying with LaT
 Click the clipboard icon in the Zotero toolbar to copy selected item(s) as BibTeX, ready to paste into any `.bib` file. BibClip handles all the LaTeX formatting automatically:
 
 - Accented characters are converted to LaTeX commands (`ü` → `{\"u}`, `é` → `{\'e}`, etc.)
-- Special characters are escaped (`&` → `\&`, `#` → `\#`, `%` → `\%`)
+- LaTeX special characters are escaped (`&` → `\&`, `_` → `\_`, `#` → `\#`, `%` → `\%`, and others)
 - Rogue Unicode whitespace inserted by Zotero's CSL engine is removed
-- Citation keys are auto-generated if missing, and are always unique across the library
+- Missing citation keys are generated uniquely across the library; selected items with duplicate existing keys are rejected with an error
 
 ## Installation
 
@@ -21,29 +21,9 @@ Click the clipboard icon in the Zotero toolbar to copy selected item(s) as BibTe
 2. In Zotero: **Tools → Plugins → ⚙️ → Install Plugin from File...**
 3. Select the `.xpi` file
 
-## Version bump workflow
+Updates are currently manual: download and install each new release from the Releases page.
 
-When releasing a new version, use the helper script with the next version number:
-
-```bash
-./bump-version.sh NEW_VERSION
-```
-
-To update version references without creating a git tag:
-
-```bash
-./bump-version.sh NEW_VERSION --no-tag
-```
-
-Replace `NEW_VERSION` with the release version (for example, `2.1.3` after `2.1.2`).
-
-This updates:
-- `manifest.json` version
-- the banner comment in `prefs.js`
-- commits both files
-- optionally creates a Git tag named `v<version>`
-
-See [CHANGELOG.md](./CHANGELOG.md) for release notes.
+Release notes are tracked in [CHANGELOG.md](./CHANGELOG.md).
 
 ## Usage
 
@@ -57,6 +37,7 @@ BibClip uses Zotero's built-in **Citation Key** field (visible in the item Info 
 
 - If a citation key is already set, it is used as-is 
 - If the field is empty, BibClip generates a key, saves it to the field, and then exports
+- If the key is already used by another item anywhere in the same library, including in another collection or subcollection, BibClip reports the conflict instead of exporting a duplicate
 
 ### Citation key format
 
@@ -107,9 +88,15 @@ For journal articles, BibClip can use either:
 
 | Input | Output |
 | :---- | :----- |
+| `\` | `\textbackslash{}` |
+| `{` / `}` | `\{` / `\}` |
+| `$` | `\$` |
 | `&`   | `\&`  |
 | `#`   | `\#`  |
 | `%`   | `\%`  |
+| `_` | `\_` |
+| `^` | `\textasciicircum{}` |
+| `~` | `\textasciitilde{}` |
 
 ### Rogue Whitespace Removal
 
