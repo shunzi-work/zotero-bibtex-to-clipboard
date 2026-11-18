@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+
+## 2.1.4 - 2026-11-18
+
 ### Added
 
 - Added export preferences for publisher, edition, address, keywords, and Extra note fields.
